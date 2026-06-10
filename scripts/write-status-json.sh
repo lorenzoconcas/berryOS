@@ -67,19 +67,16 @@ read_disks_json() {
     $2 != "tmpfs" &&
     $2 != "devtmpfs" &&
     $2 != "overlay" &&
-    (
-      $7 == "/" ||
-      index($7, "/mnt/") == 1 ||
-      index($7, "/media/") == 1
-    ) {
-      gsub("%", "", $6);
+    ($7 == "/" || index($7, "/mnt/") == 1 || index($7, "/media/") == 1)
+    {
+      gsub("%", "", $6)
 
       if (!first) {
-        printf ",\n";
+        printf ",\n"
       }
 
-      printf "    {\"mount\":\"%s\",\"used\":%d}", $7, $6;
-      first = 0;
+      printf "    {\"mount\":\"%s\",\"used\":%d}", $7, $6
+      first = 0
     }
   '
 }
