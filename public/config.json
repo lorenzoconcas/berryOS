@@ -35,7 +35,7 @@
       "name": "Portainer",
       "description": "Container Docker",
       "url": "/apps/portainer/",
-      "proxyTarget": "https://127.0.0.1:9400",
+      "proxyTarget": "https://127.0.0.1:9443",
       "embed": true,
       "icon": "Container",
       "accent": "from-cyan-400 to-blue-700"
