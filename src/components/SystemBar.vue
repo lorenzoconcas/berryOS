@@ -1,6 +1,6 @@
 <template>
   <header
-    class="glass-panel absolute inset-x-0 top-0 z-[60] flex h-12 items-center justify-between rounded-none border-x-0 border-t-0 px-3 sm:px-4"
+    class="glass-panel absolute inset-x-0 top-0 z-[60] flex h-12 items-center justify-between rounded-none border-x-0 border-t-0 px-3 sm:px-4 border-none!"
   >
     <div class="flex min-w-0 items-center gap-3">
 <!--      <button
