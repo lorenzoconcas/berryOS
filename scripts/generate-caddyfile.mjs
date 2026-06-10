@@ -24,22 +24,58 @@ const parsed = JSON.parse(rawConfig);
 
 const services = Array.isArray(parsed.services) ? parsed.services : [];
 
-const routeBlocks = services
-  .filter(
-    (service) =>
-      typeof service?.url === "string" &&
-      service.url.startsWith("/apps/") &&
-      typeof service?.proxyTarget === "string" &&
-      service.proxyTarget.length > 0,
-  )
-  .map((service) => {
+const createProxyBlock = (path, target, stripPrefix) => {
+  const normalizedPath = path.replace(/\/$/, "") || "/";
+  const isExactFile =
+    normalizedPath !== "/" &&
+    /\.[A-Za-z0-9]+$/.test(normalizedPath.split("/").pop() || "");
+
+  if (stripPrefix) {
+    return `  handle_path ${normalizedPath}/* {\n    reverse_proxy ${target}\n  }`;
+  }
+
+  if (normalizedPath === "/") {
+    return `  handle /* {\n    reverse_proxy ${target}\n  }`;
+  }
+
+  if (isExactFile) {
+    return `  handle ${normalizedPath} {\n    reverse_proxy ${target}\n  }`;
+  }
+
+  return `  handle ${normalizedPath}* {\n    reverse_proxy ${target}\n  }`;
+};
+
+const routeBlocks = [];
+
+for (const service of services) {
+  if (
+    typeof service?.proxyTarget !== "string" ||
+    service.proxyTarget.length === 0
+  ) {
+    continue;
+  }
+
+  if (typeof service?.url === "string" && service.url.startsWith("/apps/")) {
     const routePrefix = new URL(
       service.url,
       "http://berry.local",
     ).pathname.replace(/\/$/, "");
 
-    return `  handle_path ${routePrefix}/* {\n    reverse_proxy ${service.proxyTarget}\n  }`;
-  });
+    routeBlocks.push(createProxyBlock(routePrefix, service.proxyTarget, true));
+  }
+
+  if (!Array.isArray(service?.proxyPaths)) {
+    continue;
+  }
+
+  for (const rawPath of service.proxyPaths) {
+    if (typeof rawPath !== "string" || !rawPath.startsWith("/")) {
+      continue;
+    }
+
+    routeBlocks.push(createProxyBlock(rawPath, service.proxyTarget, false));
+  }
+}
 
 const statusRoot = statusFile.replace(/\/[^/]+$/, "") || ".";
 const statusFilename = statusFile.split("/").pop() || "status.json";

@@ -15,7 +15,39 @@ berry.local {
   }
 
   handle_path /apps/home-assistant/* {
-    reverse_proxy http://berry.local:8123
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /auth* {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /api* {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /frontend_latest* {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /hacsfiles* {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /local* {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /manifest.json {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /service_worker.js {
+    reverse_proxy http://127.0.0.1:8123
+  }
+
+  handle /static* {
+    reverse_proxy http://127.0.0.1:8123
   }
 
   handle_path /apps/portainer/* {

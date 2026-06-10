@@ -47,7 +47,17 @@ Modifica `public/config.json`:
       "name": "Home Assistant",
       "description": "Domotica e automazioni",
       "url": "/apps/home-assistant/",
-      "proxyTarget": "http://berry.local:8123",
+      "proxyTarget": "http://127.0.0.1:8123",
+      "proxyPaths": [
+        "/auth",
+        "/api",
+        "/frontend_latest",
+        "/hacsfiles",
+        "/local",
+        "/manifest.json",
+        "/service_worker.js",
+        "/static"
+      ],
       "embed": true,
       "icon": "House",
       "accent": "from-sky-400 to-blue-600"
@@ -60,11 +70,14 @@ Campi chiave:
 
 - `url`: URL visto dal browser. Per l'embed same-origin deve essere un path di BerryOS, per esempio `/apps/home-assistant/`.
 - `proxyTarget`: upstream reale a cui Caddy o Vite devono inoltrare le richieste, per esempio `http://berry.local:8123` oppure `http://127.0.0.1:8123`.
+- `proxyPaths`: path assoluti opzionali da inoltrare allo stesso upstream, utili per app come Home Assistant che caricano moduli e asset da `/frontend_latest`, `/static`, `/api` e simili.
 - `embed`: se `true`, BerryOS apre il servizio dentro una finestra iframe.
 - `statusEndpoint`: endpoint JSON opzionale da cui BerryOS legge lo stato live del server.
 - `status`: fallback statico usato se `statusEndpoint` non è disponibile.
 
 `embed: true` funziona bene quando il browser vede BerryOS e app sulla stessa origin. Se un servizio imposta `X-Frame-Options: sameorigin`, il modo giusto per farlo funzionare è servirlo dietro la stessa origin di BerryOS tramite reverse proxy.
+
+Per Home Assistant su Docker con `network_mode: host`, conviene usare `proxyTarget: "http://127.0.0.1:8123"` e dichiarare i `proxyPaths` principali, altrimenti gli import assoluti di HA finiscono sulla root di BerryOS e tornano come `text/html`.
 
 ## Stato Server Via Caddy
 

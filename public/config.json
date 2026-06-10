@@ -15,7 +15,17 @@
       "name": "Home Assistant",
       "description": "Domotica e automazioni",
       "url": "/apps/home-assistant/",
-      "proxyTarget": "http://berry.local:8123",
+      "proxyTarget": "http://127.0.0.1:8123",
+      "proxyPaths": [
+        "/auth",
+        "/api",
+        "/frontend_latest",
+        "/hacsfiles",
+        "/local",
+        "/manifest.json",
+        "/service_worker.js",
+        "/static"
+      ],
       "embed": true,
       "icon": "House",
       "accent": "from-sky-400 to-blue-600"
@@ -25,30 +35,10 @@
       "name": "Portainer",
       "description": "Container Docker",
       "url": "/apps/portainer/",
-      "proxyTarget": "http://berry.local:9000",
+      "proxyTarget": "https://127.0.0.1:9400",
       "embed": true,
       "icon": "Container",
       "accent": "from-cyan-400 to-blue-700"
-    },
-    {
-      "id": "google",
-      "name": "Google",
-      "description": "Container Docker",
-      "url": "/apps/google/",
-      "proxyTarget": "https://facebook.com",
-      "embed": true,
-      "icon": "google",
-      "accent": "from-cyan-400 to-blue-700"
-    },
-    {
-      "id": "adguard",
-      "name": "AdGuard Home",
-      "description": "DNS e blocco pubblicità",
-      "url": "/apps/adguard/",
-      "proxyTarget": "http://berry.local:3000",
-      "embed": true,
-      "icon": "ShieldCheck",
-      "accent": "from-emerald-400 to-green-700"
     },
     {
       "id": "immich",
@@ -90,7 +80,7 @@
       "icon": "KeyRound",
       "accent": "from-zinc-200 to-zinc-700"
     },
-    {
+    /*{
       "id": "nextcloud",
       "name": "Nextcloud",
       "description": "File e documenti",
@@ -99,6 +89,6 @@
       "embed": true,
       "icon": "Cloud",
       "accent": "from-blue-400 to-sky-700"
-    }
+    }*/
   ]
 }

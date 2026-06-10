@@ -61,6 +61,13 @@ const normalizeService = (
   index: number,
 ): ServiceItem => {
   const seed = hashString(service.id || service.name || String(index));
+  const proxyPaths = Array.isArray(service.proxyPaths)
+    ? service.proxyPaths.filter(
+        (path): path is string =>
+          typeof path === "string" && path.trim().startsWith("/"),
+      )
+    : [];
+
   return {
     id: service.id || `service-${index + 1}`,
     name: service.name || `Service ${index + 1}`,
@@ -73,6 +80,7 @@ const normalizeService = (
       typeof service.proxyTarget === "string" && service.proxyTarget.trim()
         ? service.proxyTarget
         : undefined,
+    proxyPaths,
     embed: service.embed !== false,
     icon:
       typeof service.icon === "string" && service.icon.trim()

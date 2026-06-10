@@ -4,6 +4,7 @@ export type ServiceConfigInput = {
   description?: string;
   url?: string;
   proxyTarget?: string;
+  proxyPaths?: string[];
   embed?: boolean;
   icon?: string;
   accent?: string;
@@ -15,6 +16,7 @@ export type ServiceItem = {
   description: string;
   url: string;
   proxyTarget?: string;
+  proxyPaths: string[];
   embed: boolean;
   icon: string;
   accent: string;
