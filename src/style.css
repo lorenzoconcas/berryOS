@@ -1,0 +1,397 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --berry-bg: #04111f;
+  --berry-panel: rgba(8, 20, 38, 0.62);
+  --berry-border: rgba(255, 255, 255, 0.14);
+  --berry-text: rgba(255, 255, 255, 0.96);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family:
+    "SF Pro Display",
+    "SF Pro Text",
+    "ui-rounded",
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+  color: var(--berry-text);
+  background:
+    radial-gradient(circle at top, rgba(125, 211, 252, 0.18), transparent 38%),
+    linear-gradient(180deg, #03111e 0%, #071a2c 100%);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.berry-shell {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--berry-bg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.berry-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.16), transparent 30%),
+    radial-gradient(circle at 80% 18%, rgba(251, 191, 36, 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.2), rgba(2, 6, 23, 0.45));
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.glass-panel {
+  background: var(--berry-panel);
+  border: 1px solid var(--berry-border);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px) saturate(145%);
+}
+
+.panel-frost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  border-radius: 999px;
+  padding: 0 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-pill-button {
+  border: 0;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.status-pill-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.desktop-icons-area {
+  position: absolute;
+  inset: 3.75rem 0 5.8rem;
+  overflow: hidden;
+  padding: 0 1rem 1rem;
+}
+
+.desktop-icons-canvas {
+  position: relative;
+  min-height: 100%;
+  height: 100%;
+}
+
+.desktop-icon {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 1.6rem;
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.desktop-icon:hover,
+.desktop-icon:focus-visible,
+.desktop-icon-selected {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.18);
+  outline: none;
+}
+
+.desktop-icon:hover {
+  transform: translateY(-2px);
+}
+
+.desktop-icon-floating {
+  position: absolute;
+  width: 104px;
+  min-height: 118px;
+}
+
+.desktop-icon-dragging {
+  z-index: 5;
+  cursor: grabbing;
+  transform: scale(1.02);
+}
+
+.desktop-icon-label {
+  margin-top: 0.7rem;
+  display: inline-flex;
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.3;
+  word-break: break-word;
+  text-wrap: balance;
+  background: rgba(2, 6, 23, 0.18);
+}
+
+.desktop-empty-state {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+}
+
+.launcher-shell,
+.status-shell {
+  animation: launcher-in 180ms ease;
+}
+
+.launcher-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1rem;
+}
+
+.launcher-app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.9rem;
+}
+
+.launcher-app {
+  min-width: 0;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  padding: 1rem;
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.launcher-app:hover {
+  transform: translateY(-3px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
+  box-shadow: 0 18px 32px rgba(2, 6, 23, 0.18);
+}
+
+.launcher-pin-button,
+.launcher-action-button {
+  border: 0;
+}
+
+.launcher-pin-button {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.launcher-pin-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.launcher-action-button {
+  min-height: 2.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 0 0.9rem;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.launcher-action-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dock-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 1.2rem;
+  padding: 0.5rem 0.7rem 0.7rem;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.dock-item:hover {
+  transform: translateY(-2px);
+}
+
+.dock-launcher {
+  padding-inline: 0.7rem;
+}
+
+.traffic-light {
+  height: 0.78rem;
+  width: 0.78rem;
+  border-radius: 999px;
+  border: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.window-action {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.9rem;
+  color: rgba(15, 23, 42, 0.68);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.window-action:hover {
+  background: rgba(148, 163, 184, 0.12);
+  color: rgba(15, 23, 42, 0.92);
+}
+
+.status-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.status-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.status-value {
+  margin-top: 1.35rem;
+  font-size: clamp(1.75rem, 2vw, 2.4rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.status-meter {
+  margin-top: 1rem;
+  height: 0.7rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.status-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(103, 232, 249, 0.88),
+    rgba(59, 130, 246, 0.92)
+  );
+}
+
+@keyframes launcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-icons-area {
+    inset: 3.75rem 0 5.4rem;
+    padding-inline: 0.75rem;
+  }
+
+  .desktop-icon-floating {
+    width: 96px;
+  }
+
+  .launcher-app-grid,
+  .status-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 479px) {
+  .launcher-search {
+    width: 100%;
+  }
+}

@@ -1,0 +1,6 @@
+[Unit]
+Description=Generate BerryOS status JSON
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /var/www/berry-os/scripts/write-status-json.sh /var/lib/berry-os/status/status.json

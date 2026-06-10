@@ -1,0 +1,104 @@
+{
+  "title": "Berry",
+  "subtitle": "Home server",
+  "wallpaper": "/wallpaper.svg",
+  "statusEndpoint": "/api/status",
+  "status": {
+    "cpu": 13,
+    "ram": 42,
+    "temperature": 48,
+    "uptime": "12g 4h"
+  },
+  "services": [
+    {
+      "id": "home-assistant",
+      "name": "Home Assistant",
+      "description": "Domotica e automazioni",
+      "url": "/apps/home-assistant/",
+      "proxyTarget": "http://berry.local:8123",
+      "embed": true,
+      "icon": "House",
+      "accent": "from-sky-400 to-blue-600"
+    },
+    {
+      "id": "portainer",
+      "name": "Portainer",
+      "description": "Container Docker",
+      "url": "/apps/portainer/",
+      "proxyTarget": "http://berry.local:9000",
+      "embed": true,
+      "icon": "Container",
+      "accent": "from-cyan-400 to-blue-700"
+    },
+    {
+      "id": "google",
+      "name": "Google",
+      "description": "Container Docker",
+      "url": "/apps/google/",
+      "proxyTarget": "https://facebook.com",
+      "embed": true,
+      "icon": "google",
+      "accent": "from-cyan-400 to-blue-700"
+    },
+    {
+      "id": "adguard",
+      "name": "AdGuard Home",
+      "description": "DNS e blocco pubblicità",
+      "url": "/apps/adguard/",
+      "proxyTarget": "http://berry.local:3000",
+      "embed": true,
+      "icon": "ShieldCheck",
+      "accent": "from-emerald-400 to-green-700"
+    },
+    {
+      "id": "immich",
+      "name": "Immich",
+      "description": "Foto e backup",
+      "url": "/apps/immich/",
+      "proxyTarget": "http://berry.local:2283",
+      "embed": true,
+      "icon": "Images",
+      "accent": "from-pink-400 to-orange-500"
+    },
+    {
+      "id": "jellyfin",
+      "name": "Jellyfin",
+      "description": "Media server",
+      "url": "/apps/jellyfin/",
+      "proxyTarget": "http://berry.local:8096",
+      "embed": true,
+      "icon": "Play",
+      "accent": "from-violet-500 to-purple-800"
+    },
+    {
+      "id": "uptime-kuma",
+      "name": "Uptime Kuma",
+      "description": "Monitoraggio servizi",
+      "url": "/apps/uptime-kuma/",
+      "proxyTarget": "http://berry.local:3002",
+      "embed": true,
+      "icon": "Activity",
+      "accent": "from-lime-400 to-emerald-700"
+    },
+    {
+      "id": "vaultwarden",
+      "name": "Vaultwarden",
+      "description": "Password manager",
+      "url": "/apps/vaultwarden/",
+      "proxyTarget": "http://berry.local:8080",
+      "embed": false,
+      "icon": "KeyRound",
+      "accent": "from-zinc-200 to-zinc-700"
+    },
+    {
+      "id": "nextcloud",
+      "name": "Nextcloud",
+      "description": "File e documenti",
+      "url": "/apps/nextcloud/",
+      "proxyTarget": "http://berry.local:8081",
+      "embed": true,
+      "icon": "Cloud",
+      "accent": "from-blue-400 to-sky-700"
+    }
+  ]
+}

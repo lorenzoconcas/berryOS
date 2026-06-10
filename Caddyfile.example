@@ -1,0 +1,57 @@
+# Example:
+# npm run generate:caddyfile -- --host berry.local --dist /var/www/berry-os/dist --status-file /var/lib/berry-os/status/status.json --config public/config.json > /etc/caddy/Caddyfile
+# sudo caddy validate --config /etc/caddy/Caddyfile
+# sudo systemctl reload caddy
+
+berry.local {
+  root * /var/www/berry-os/dist
+  encode zstd gzip
+
+  handle /api/status {
+    root * /var/lib/berry-os/status
+    rewrite * /status.json
+    header Content-Type application/json
+    file_server
+  }
+
+  handle_path /apps/home-assistant/* {
+    reverse_proxy http://berry.local:8123
+  }
+
+  handle_path /apps/portainer/* {
+    reverse_proxy http://berry.local:9000
+  }
+
+  handle_path /apps/google/* {
+    reverse_proxy https://facebook.com
+  }
+
+  handle_path /apps/adguard/* {
+    reverse_proxy http://berry.local:3000
+  }
+
+  handle_path /apps/immich/* {
+    reverse_proxy http://berry.local:2283
+  }
+
+  handle_path /apps/jellyfin/* {
+    reverse_proxy http://berry.local:8096
+  }
+
+  handle_path /apps/uptime-kuma/* {
+    reverse_proxy http://berry.local:3002
+  }
+
+  handle_path /apps/vaultwarden/* {
+    reverse_proxy http://berry.local:8080
+  }
+
+  handle_path /apps/nextcloud/* {
+    reverse_proxy http://berry.local:8081
+  }
+
+  handle {
+    try_files {path} /index.html
+    file_server
+  }
+}

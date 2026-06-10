@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh BerryOS status JSON every 30 seconds
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=30s
+Unit=berry-status.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,85 @@
+#!/usr/bin/env sh
+
+set -eu
+
+OUTPUT_PATH="${1:-/var/lib/berry-os/status/status.json}"
+OUTPUT_DIR=$(dirname "$OUTPUT_PATH")
+TEMP_FILE="$OUTPUT_PATH.tmp"
+
+mkdir -p "$OUTPUT_DIR"
+
+read_cpu_percent() {
+  if command -v top >/dev/null 2>&1; then
+    top -bn1 | awk -F'id,' '/Cpu\(s\)|%Cpu/ {
+      split($1, parts, ",");
+      gsub(/[^0-9.]/, "", parts[length(parts)]);
+      idle=parts[length(parts)];
+      if (idle == "") idle=0;
+      printf "%.0f", 100 - idle;
+      exit;
+    }'
+    return
+  fi
+
+  echo 0
+}
+
+read_ram_percent() {
+  if command -v free >/dev/null 2>&1; then
+    free | awk '/Mem:/ {
+      if ($2 == 0) { print 0; exit }
+      printf "%.0f", ($3 / $2) * 100;
+      exit;
+    }'
+    return
+  fi
+
+  echo 0
+}
+
+read_temperature() {
+  if [ -r /sys/class/thermal/thermal_zone0/temp ]; then
+    awk '{ printf "%.0f", $1 / 1000 }' /sys/class/thermal/thermal_zone0/temp
+    return
+  fi
+
+  if command -v vcgencmd >/dev/null 2>&1; then
+    vcgencmd measure_temp | awk -F'[=.]' '{ print $2; exit }'
+    return
+  fi
+
+  echo 0
+}
+
+read_uptime_human() {
+  awk '{
+    total = int($1);
+    days = int(total / 86400);
+    hours = int((total % 86400) / 3600);
+    minutes = int((total % 3600) / 60);
+
+    if (days > 0) {
+      printf "%dd %dh", days, hours;
+    } else if (hours > 0) {
+      printf "%dh %dm", hours, minutes;
+    } else {
+      printf "%dm", minutes;
+    }
+  }' /proc/uptime
+}
+
+CPU=$(read_cpu_percent)
+RAM=$(read_ram_percent)
+TEMPERATURE=$(read_temperature)
+UPTIME=$(read_uptime_human)
+
+cat >"$TEMP_FILE" <<EOF
+{
+  "cpu": $CPU,
+  "ram": $RAM,
+  "temperature": $TEMPERATURE,
+  "uptime": "$UPTIME"
+}
+EOF
+
+mv "$TEMP_FILE" "$OUTPUT_PATH"
