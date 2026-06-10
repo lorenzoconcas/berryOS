@@ -9,15 +9,8 @@ TEMP_FILE="$OUTPUT_PATH.tmp"
 mkdir -p "$OUTPUT_DIR"
 
 read_cpu_percent() {
-  if command -v top >/dev/null 2>&1; then
-    top -bn1 | awk -F'id,' '/Cpu\(s\)|%Cpu/ {
-      split($1, parts, ",");
-      gsub(/[^0-9.]/, "", parts[length(parts)]);
-      idle=parts[length(parts)];
-      if (idle == "") idle=0;
-      printf "%.0f", 100 - idle;
-      exit;
-    }'
+  if command -v vmstat >/dev/null 2>&1; then
+    vmstat 1 2 | tail -1 | awk '{ printf "%.0f", 100 - $15 }'
     return
   fi
 
@@ -28,7 +21,7 @@ read_ram_percent() {
   if command -v free >/dev/null 2>&1; then
     free | awk '/Mem:/ {
       if ($2 == 0) { print 0; exit }
-      printf "%.0f", ($3 / $2) * 100;
+      printf "%.0f", (($2 - $7) / $2) * 100;
       exit;
     }'
     return
