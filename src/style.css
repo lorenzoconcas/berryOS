@@ -392,7 +392,7 @@ button {
   align-items: center;
   justify-content: center;
   border-radius: 0.9rem;
-  color: rgba(15, 23, 42, 0.68);
+  color: rgba(255, 255, 255, 0.68);
   transition:
     background-color 160ms ease,
     color 160ms ease;
@@ -400,7 +400,7 @@ button {
 
 .window-action:hover {
   background: rgba(148, 163, 184, 0.12);
-  color: rgba(15, 23, 42, 0.92);
+  color: rgba(76, 132, 155, 0.92);
 }
 
 .status-grid {
