@@ -29,6 +29,19 @@ export type ConfigStatus = {
   uptime: string;
 };
 
+export type DesktopWidgetId =
+  | "cpu"
+  | "ram"
+  | "temperature"
+  | "uptime"
+  | "clock";
+
+export type DesktopWidgetDefinition = {
+  id: DesktopWidgetId;
+  title: string;
+  description: string;
+};
+
 export type BerryConfigInput = {
   title?: string;
   subtitle?: string;

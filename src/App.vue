@@ -9,14 +9,25 @@
       :launcher-open="launcherOpen"
       @toggle-launcher="toggleLauncher"
       @open-status="openStatus"
+      @open-wallpaper="openWallpaper"
+      @open-project-info="openProjectInfo"
     />
 
     <main class="absolute inset-0">
       <DesktopIcons
         :services="desktopServices"
-        :positions="desktopPositions"
+        :positions="servicePositions"
         @open-service="handleServiceOpen"
-        @update-position="updateDesktopPosition"
+        @update-position="updateDesktopServicePosition"
+      />
+
+      <DesktopWidgets
+        :widgets="desktopWidgets"
+        :positions="widgetPositions"
+        :status="config.status"
+        :time="time"
+        @toggle-pin="toggleDesktopWidgetPin"
+        @update-position="updateDesktopWidgetPosition"
       />
 
       <ServiceWindow
@@ -30,16 +41,39 @@
       v-if="launcherOpen"
       :title="config.title"
       :services="services"
-      :pinned-ids="pinnedIds"
+      :pinned-service-ids="pinnedServiceIds"
+      :widgets="desktopWidgetCatalog"
+      :pinned-widget-ids="pinnedWidgetIds"
       @close="launcherOpen = false"
       @open-service="openFromLauncher"
-      @toggle-pin="toggleDesktopPin"
+      @toggle-service-pin="toggleDesktopServicePin"
+      @toggle-widget-pin="toggleDesktopWidgetPin"
     />
 
     <StatusPanel
       v-if="statusOpen"
       :status="config.status"
       @close="statusOpen = false"
+    />
+
+    <WallpaperPanel
+      v-if="wallpaperOpen"
+      :current-wallpaper="currentWallpaper"
+      :presets="wallpaperPresets"
+      :is-active-wallpaper="isActiveWallpaper"
+      @close="wallpaperOpen = false"
+      @select-preset="applyPreset"
+      @randomize="applyRandomWallpaper"
+      @reset="resetWallpaper"
+      @apply-custom-url="applyCustomUrl"
+      @upload-file="handleWallpaperUpload"
+    />
+
+    <ProjectInfoPanel
+      v-if="projectInfoOpen"
+      :title="config.title"
+      version="0.1.0"
+      @close="projectInfoOpen = false"
     />
 
     <TaskDock
@@ -79,39 +113,97 @@
 import { computed, onBeforeUnmount, onMounted, provide, ref } from "vue";
 import DesktopIcons from "./components/DesktopIcons.vue";
 import LauncherPanel from "./components/LauncherPanel.vue";
+import ProjectInfoPanel from "./components/ProjectInfoPanel.vue";
 import ServiceWindow from "./components/ServiceWindow.vue";
 import StatusPanel from "./components/StatusPanel.vue";
 import SystemBar from "./components/SystemBar.vue";
 import TaskDock from "./components/TaskDock.vue";
+import DesktopWidgets from "./components/DesktopWidgets.vue";
+import WallpaperPanel from "./components/WallpaperPanel.vue";
 import { useBerryConfig } from "./composables/useBerryConfig";
 import { useDesktopLayout } from "./composables/useDesktopLayout";
+import { useWallpaperManager } from "./composables/useWallpaperManager";
 import {
   createWindowManager,
   windowManagerKey,
 } from "./composables/windowManager";
-import type { DesktopPosition, ServiceItem } from "./types/config";
+import type {
+  DesktopPosition,
+  DesktopWidgetDefinition,
+  DesktopWidgetId,
+  ServiceItem,
+} from "./types/config";
 
 const { config, configError, loading, loadConfig, refreshStatus, services } =
   useBerryConfig();
 const launcherOpen = ref(false);
 const statusOpen = ref(false);
+const wallpaperOpen = ref(false);
+const projectInfoOpen = ref(false);
 const time = ref("");
 const timeTimer = ref<number | null>(null);
 const statusTimer = ref<number | null>(null);
 const windowManager = createWindowManager();
+const desktopWidgetCatalog: DesktopWidgetDefinition[] = [
+  {
+    id: "cpu",
+    title: "CPU",
+    description: "Uso attuale del processore",
+  },
+  {
+    id: "ram",
+    title: "RAM",
+    description: "Memoria in uso sul sistema",
+  },
+  {
+    id: "temperature",
+    title: "Temperatura",
+    description: "Sensore principale del dispositivo",
+  },
+  {
+    id: "uptime",
+    title: "Uptime",
+    description: "Tempo di attività del server",
+  },
+  {
+    id: "clock",
+    title: "Orologio",
+    description: "Ora locale sempre visibile",
+  },
+];
 const {
   desktopServices,
-  pinnedIds,
-  positions: desktopPositions,
-  togglePinned,
-  updatePosition,
-} = useDesktopLayout(() => services.value);
+  desktopWidgets,
+  pinnedServiceIds,
+  pinnedWidgetIds,
+  servicePositions,
+  widgetPositions,
+  toggleServicePinned,
+  toggleWidgetPinned,
+  updateServicePosition,
+  updateWidgetPosition,
+} = useDesktopLayout(
+  () => services.value,
+  () => desktopWidgetCatalog,
+  () => !loading.value,
+);
 
 provide(windowManagerKey, windowManager);
 
 const desktopStyle = computed<Record<string, string>>(() => ({
-  backgroundImage: `url(${config.value.wallpaper})`,
+  backgroundImage: `url(${currentWallpaper.value})`,
 }));
+
+const {
+  wallpaperPresets,
+  currentWallpaper,
+  applyCustomUrl,
+  applyPreset,
+  applyRandomWallpaper,
+  isActiveWallpaper,
+  resetWallpaper,
+  uploadCustomWallpaper,
+} = useWallpaperManager(() => config.value.wallpaper);
 
 const updateTime = () => {
   time.value = new Intl.DateTimeFormat("it-IT", {
@@ -122,16 +214,36 @@ const updateTime = () => {
 
 const toggleLauncher = () => {
   statusOpen.value = false;
+  wallpaperOpen.value = false;
+  projectInfoOpen.value = false;
   launcherOpen.value = !launcherOpen.value;
 };
 
 const openStatus = () => {
   launcherOpen.value = false;
+  wallpaperOpen.value = false;
+  projectInfoOpen.value = false;
   statusOpen.value = true;
+};
+
+const openWallpaper = () => {
+  launcherOpen.value = false;
+  statusOpen.value = false;
+  projectInfoOpen.value = false;
+  wallpaperOpen.value = true;
+};
+
+const openProjectInfo = () => {
+  launcherOpen.value = false;
+  statusOpen.value = false;
+  wallpaperOpen.value = false;
+  projectInfoOpen.value = true;
 };
 
 const handleServiceOpen = (service: ServiceItem) => {
   statusOpen.value = false;
+  wallpaperOpen.value = false;
+  projectInfoOpen.value = false;
   windowManager.openService(service);
 };
 
@@ -140,15 +252,34 @@ const openFromLauncher = (service: ServiceItem) => {
   handleServiceOpen(service);
 };
 
-const toggleDesktopPin = (serviceId: string) => {
-  togglePinned(serviceId);
+const toggleDesktopServicePin = (serviceId: string) => {
+  toggleServicePinned(serviceId);
 };
 
-const updateDesktopPosition = (
+const toggleDesktopWidgetPin = (widgetId: DesktopWidgetId) => {
+  toggleWidgetPinned(widgetId);
+};
+
+const updateDesktopServicePosition = (
   serviceId: string,
   position: DesktopPosition,
 ) => {
-  updatePosition(serviceId, position);
+  updateServicePosition(serviceId, position);
+};
+
+const updateDesktopWidgetPosition = (
+  widgetId: DesktopWidgetId,
+  position: DesktopPosition,
+) => {
+  updateWidgetPosition(widgetId, position);
+};
+
+const handleWallpaperUpload = async (file: File) => {
+  try {
+    await uploadCustomWallpaper(file);
+  } catch {
+    // Ignore invalid wallpaper uploads and keep the current background.
+  }
 };
 
 const onKeydown = (event: KeyboardEvent) => {
@@ -161,6 +292,12 @@ const onKeydown = (event: KeyboardEvent) => {
   }
   if (statusOpen.value) {
     statusOpen.value = false;
+  }
+  if (wallpaperOpen.value) {
+    wallpaperOpen.value = false;
+  }
+  if (projectInfoOpen.value) {
+    projectInfoOpen.value = false;
   }
 };
 
