@@ -16,8 +16,8 @@ const host = readArg("--host", "berry.local");
 const dist = readArg("--dist", "/var/www/berry-os/dist");
 const statusFile = readArg("--status-file", "/var/lib/berry-os/status/status.json");
 const configPath = resolve(
-  process.cwd(),
-  readArg("--config", "public/config.json"),
+    process.cwd(),
+    readArg("--config", "public/config.json"),
 );
 
 const parseConfigJson = (rawConfig) => {
@@ -49,6 +49,7 @@ const parseConfigJson = (rawConfig) => {
 
     if (inString) {
       sanitized += char;
+
       if (escaped) {
         escaped = false;
       } else if (char === "\\") {
@@ -56,6 +57,7 @@ const parseConfigJson = (rawConfig) => {
       } else if (char === "\"") {
         inString = false;
       }
+
       continue;
     }
 
@@ -88,44 +90,75 @@ const parsed = parseConfigJson(rawConfig);
 
 const services = Array.isArray(parsed.services) ? parsed.services : [];
 
-const createProxyBlock = (path, target, stripPrefix) => {
+const createProxyBlock = (
+    path,
+    target,
+    stripPrefix,
+    tlsInsecure = false,
+) => {
   const normalizedPath = path.replace(/\/$/, "") || "/";
+
   const isExactFile =
-    normalizedPath !== "/" &&
-    /\.[A-Za-z0-9]+$/.test(normalizedPath.split("/").pop() || "");
+      normalizedPath !== "/" &&
+      /\.[A-Za-z0-9]+$/.test(normalizedPath.split("/").pop() || "");
+
+  const reverseProxy = tlsInsecure
+      ? `reverse_proxy ${target} {
+      transport http {
+        tls_insecure_skip_verify
+      }
+    }`
+      : `reverse_proxy ${target}`;
 
   if (stripPrefix) {
-    return `  handle_path ${normalizedPath}/* {\n    reverse_proxy ${target}\n  }`;
+    return `  handle_path ${normalizedPath}/* {
+    ${reverseProxy}
+  }`;
   }
 
   if (normalizedPath === "/") {
-    return `  handle /* {\n    reverse_proxy ${target}\n  }`;
+    return `  handle /* {
+    ${reverseProxy}
+  }`;
   }
 
   if (isExactFile) {
-    return `  handle ${normalizedPath} {\n    reverse_proxy ${target}\n  }`;
+    return `  handle ${normalizedPath} {
+    ${reverseProxy}
+  }`;
   }
 
-  return `  handle ${normalizedPath}* {\n    reverse_proxy ${target}\n  }`;
+  return `  handle ${normalizedPath}* {
+    ${reverseProxy}
+  }`;
 };
 
 const routeBlocks = [];
 
 for (const service of services) {
   if (
-    typeof service?.proxyTarget !== "string" ||
-    service.proxyTarget.length === 0
+      typeof service?.proxyTarget !== "string" ||
+      service.proxyTarget.length === 0
   ) {
     continue;
   }
 
+  const tlsInsecure = service.proxyTlsInsecure === true;
+
   if (typeof service?.url === "string" && service.url.startsWith("/apps/")) {
     const routePrefix = new URL(
-      service.url,
-      "http://berry.local",
+        service.url,
+        "http://berry.local",
     ).pathname.replace(/\/$/, "");
 
-    routeBlocks.push(createProxyBlock(routePrefix, service.proxyTarget, true));
+    routeBlocks.push(
+        createProxyBlock(
+            routePrefix,
+            service.proxyTarget,
+            true,
+            tlsInsecure,
+        ),
+    );
   }
 
   if (!Array.isArray(service?.proxyPaths)) {
@@ -137,7 +170,14 @@ for (const service of services) {
       continue;
     }
 
-    routeBlocks.push(createProxyBlock(rawPath, service.proxyTarget, false));
+    routeBlocks.push(
+        createProxyBlock(
+            rawPath,
+            service.proxyTarget,
+            false,
+            tlsInsecure,
+        ),
+    );
   }
 }
 

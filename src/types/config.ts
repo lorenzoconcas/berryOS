@@ -5,6 +5,7 @@ export type ServiceConfigInput = {
   url?: string;
   proxyTarget?: string;
   proxyPaths?: string[];
+  proxyTlsInsecure?:boolean;
   embed?: boolean;
   icon?: string;
   accent?: string;
