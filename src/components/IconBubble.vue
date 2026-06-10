@@ -1,22 +1,22 @@
 <template>
   <div
-    :class="[
+      :class="[
       'grid place-items-center rounded-xl bg-gradient-to-br shadow-xs shadow-black/12',
       service.accent,
       sizeClass,
     ]"
   >
     <component
-      :is="currentIcon"
-      class="text-white drop-shadow"
-      :size="iconSize"
-      :stroke-width="2.2"
+        :is="currentIcon"
+        class="text-white drop-shadow"
+        :size="iconSize"
+        :stroke-width="2.2"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, type Component } from "vue";
+import {defineComponent, type Component} from "vue";
 import {
   Activity,
   Cloud,
@@ -28,9 +28,15 @@ import {
   Play,
   ShieldCheck,
   Server,
+  Terminal,
+  Printer,
+  Code,
+  File,
+  TerminalIcon,
+
   type LucideIcon,
 } from "@lucide/vue";
-import type { ServiceItem } from "../types/config";
+import type {ServiceItem} from "../types/config";
 
 const iconMap: Record<string, LucideIcon> = {
   Activity,
@@ -43,6 +49,11 @@ const iconMap: Record<string, LucideIcon> = {
   Play,
   ShieldCheck,
   Server,
+  Terminal,
+  Printer,
+  Code,
+  File,
+  TerminalIcon
 };
 
 export default defineComponent({
