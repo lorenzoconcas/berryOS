@@ -151,6 +151,45 @@ sudo systemctl reload caddy
 
 Nel repo trovi anche un esempio pronto in [Caddyfile.example](/Users/lore/Progetti/berry-os/Caddyfile.example).
 
+### Script Di Aggiornamento Rapido
+
+Se sei gia` dentro il server e hai il repo clonato, puoi usare:
+
+- [scripts/update-caddy.sh](/Users/lore/Progetti/berry-os/scripts/update-caddy.sh)
+
+Esempio:
+
+```bash
+cd ~/berry-os
+chmod +x scripts/update-caddy.sh
+./scripts/update-caddy.sh
+```
+
+Lo script:
+
+- esegue `npm run build`
+- aggiorna `dist/` in `/var/www/berry-os/dist`
+- copia `config.json` e gli script necessari
+- rigenera e valida `/etc/caddy/Caddyfile`
+- aggiorna il file stato iniziale
+- abilita il timer `berry-status.timer` e ricarica Caddy
+
+Variabili opzionali:
+
+- `BERRY_HOST`
+- `BERRY_DEPLOY_ROOT`
+- `BERRY_STATUS_FILE`
+- `BERRY_CADDYFILE`
+- `BERRY_CONFIG_TARGET`
+- `BERRY_DIST_TARGET`
+- `BERRY_SCRIPTS_TARGET`
+
+Esempio con host diverso:
+
+```bash
+BERRY_HOST=nas.local ./scripts/update-caddy.sh
+```
+
 ## Home Assistant Dietro Proxy
 
 Per Home Assistant dietro reverse proxy devi configurare anche:

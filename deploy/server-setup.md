@@ -144,6 +144,16 @@ ssh lore@berry.local '
 '
 ```
 
+Se stai lavorando direttamente sul server dentro il repo clonato, puoi fare la stessa cosa con un solo comando:
+
+```bash
+cd ~/berry-os
+chmod +x scripts/update-caddy.sh
+./scripts/update-caddy.sh
+```
+
+Lo script aggiorna build, config, helper script, timer di stato e `Caddyfile`, poi valida e ricarica Caddy.
+
 ## Nota Importante
 
 Il generatore legge il file passato con `--config`. In questo runbook copiamo `public/config.json` del progetto in:
