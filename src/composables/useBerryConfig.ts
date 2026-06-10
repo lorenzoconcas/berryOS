@@ -120,6 +120,69 @@ const normalizeConfig = (input: BerryConfigInput): BerryConfig => {
   };
 };
 
+const parseConfigJson = <T>(rawConfig: string): T => {
+  let sanitized = "";
+  let inString = false;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let index = 0; index < rawConfig.length; index += 1) {
+    const char = rawConfig[index];
+    const next = rawConfig[index + 1];
+
+    if (lineComment) {
+      if (char === "\n" || char === "\r") {
+        lineComment = false;
+        sanitized += char;
+      }
+      continue;
+    }
+
+    if (blockComment) {
+      if (char === "*" && next === "/") {
+        blockComment = false;
+        index += 1;
+      }
+      continue;
+    }
+
+    if (inString) {
+      sanitized += char;
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === "\"") {
+      inString = true;
+      sanitized += char;
+      continue;
+    }
+
+    if (char === "/" && next === "/") {
+      lineComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      blockComment = true;
+      index += 1;
+      continue;
+    }
+
+    sanitized += char;
+  }
+
+  return JSON.parse(sanitized.replace(/,\s*([}\]])/g, "$1")) as T;
+};
+
 export const useBerryConfig = () => {
   const config = ref<BerryConfig>(defaultConfig);
   const loading = ref(true);
@@ -158,7 +221,8 @@ export const useBerryConfig = () => {
         throw new Error("Configurazione non trovata");
       }
 
-      const data = (await response.json()) as BerryConfigInput;
+      const rawConfig = await response.text();
+      const data = parseConfigJson<BerryConfigInput>(rawConfig);
       config.value = normalizeConfig(data);
       await refreshStatus();
     } catch {
