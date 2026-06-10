@@ -1,6 +1,6 @@
 <template>
   <article
-    class="desktop-widget-card panel-frost flex h-full flex-col overflow-hidden rounded-[1.6rem] p-4 text-left"
+    class="desktop-widget-card panel-frost flex h-full flex-col overflow-hidden rounded-[1.6rem] p-4 text-left backdrop-blur-2xl"
   >
     <div class="flex items-start justify-between gap-3">
       <div

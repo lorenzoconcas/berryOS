@@ -71,8 +71,8 @@
 
     <ProjectInfoPanel
       v-if="projectInfoOpen"
-      :title="config.title"
-      version="0.1.0"
+      :title="packageMeta.name"
+      :version="packageMeta.version"
       @close="projectInfoOpen = false"
     />
 
@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, provide, ref } from "vue";
+import packageMeta from "../package.json";
 import DesktopIcons from "./components/DesktopIcons.vue";
 import LauncherPanel from "./components/LauncherPanel.vue";
 import ProjectInfoPanel from "./components/ProjectInfoPanel.vue";
