@@ -68,17 +68,44 @@ read_uptime_human() {
   }' /proc/uptime
 }
 
+read_disks_json() {
+  df -P -T | awk '
+    NR > 1 &&
+    $2 != "tmpfs" &&
+    $2 != "devtmpfs" &&
+    $2 != "overlay" &&
+    (
+      $7 == "/" ||
+      index($7, "/mnt/") == 1 ||
+      index($7, "/media/") == 1
+    ) {
+      gsub("%", "", $6);
+
+      if (!first) {
+        printf ",\n";
+      }
+
+      printf "    {\"mount\":\"%s\",\"used\":%d}", $7, $6;
+      first = 0;
+    }
+  '
+}
+
 CPU=$(read_cpu_percent)
 RAM=$(read_ram_percent)
 TEMPERATURE=$(read_temperature)
 UPTIME=$(read_uptime_human)
+DISKS_JSON=$(read_disks_json)
 
 cat >"$TEMP_FILE" <<EOF
 {
   "cpu": $CPU,
   "ram": $RAM,
   "temperature": $TEMPERATURE,
-  "uptime": "$UPTIME"
+  "uptime": "$UPTIME",
+  "disks": [
+$DISKS_JSON
+  ]
 }
 EOF
 
